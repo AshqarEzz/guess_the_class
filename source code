@@ -1,0 +1,157 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+// Simple interface to be implemented by Cup, Ball, Hat, and Pen
+// I used the identifiable word because I want to identify the wanted classes
+interface Identifiable {
+    String whoAmI(); // a function to identify which class (Ball, cup,hat,pen)is wanted
+}
+// the implements word mean that the cup uses the identifiable function to help the code to understand (in other words its inheritance
+// that can make all classes appear in the main code as all of them were in one class )
+class Cup implements  Identifiable{
+    public String whoAmI() {
+        return "C"; // the classes begin with every first initial of the wanted classes to become easier to identify in the compiler
+    }
+}
+
+class Ball implements Identifiable {
+    public String whoAmI() {
+        return "B";
+    }
+}
+
+class Hat implements Identifiable {
+    public String whoAmI() {
+        return "H";
+    }
+}
+
+class Pen implements Identifiable {
+    public String whoAmI() {
+        return "P";
+    }
+}
+
+// the unidentified function (U) to complete the 3X3 matrix
+class Unidentified implements Identifiable {
+    public String whoAmI() {
+        return "U";
+    }
+}
+
+public class midterm {
+    // Function to create objects and place their references in the grid.
+    public static void fillGrid(Identifiable[][] grid, String order) {
+        for (int i = 0; i < order.length(); i++) {
+            char c = order.charAt(i);
+            int row = i / 3;
+            int col = i % 3; // creating the order length using the for loop that the length is less than 3 (begins 0)
+
+            // the switch means that the ball, cup, hat, pen , unidentified will be put in different places in the 3X3 matrix
+            // by each one having a row and column  for it with no errors to have 2 or more classes at the same spot.
+            switch (c) {
+                case 'C':
+                    grid[row][col] = new Cup();
+                    break;
+                case 'P':
+                    grid[row][col] = new Pen();
+                    break;
+                case 'H':
+                    grid[row][col] = new Hat();
+                    break;
+                case 'B':
+                    grid[row][col] = new Ball();
+                    break;
+                case 'U':
+                    grid[row][col] = new Unidentified();
+                    break;
+            }
+        }
+    }
+
+    // Function to print the grid
+    public static void printGrid(Identifiable[][] grid, boolean[][] visible) {
+        for (int i = 0; i < 3; i++) {     // these loops let the code understand that you want a 3X3 matrix with i to be
+            for (int j = 0; j < 3; j++) {  // rows and j to be columns, and they must be less than 3 ( begins with 0)
+                if (visible[i][j]) {
+                    System.out.print(grid[i][j].whoAmI() + " "); // the + " " helps to make the terminal more readable by adding a space
+                } else {
+                    System.out.print("X ");
+                } // this function let the code print the wanted 3X3 matrix as X's.
+            }
+            System.out.println();  // to have the following output as a new line.
+        }
+    }
+
+    // the following function is to make sure the guesses are in the grid are random but in this case it's not random
+    // because in the main function there is already a way to have it so this function helps to make the wanted way achieved.
+    public static int checkGuess(Identifiable[][] grid, String guess) {
+        int correct = 0;
+        for (int i = 0; i < guess.length(); i++) {
+            int row = i / 3;
+            int col = i % 3;
+
+            if (grid[row][col].whoAmI().equals(Character.toString(guess.charAt(i)))) {
+                correct++;
+            }
+        }
+        return correct;
+    }
+
+    public static void playGame(Identifiable[][] grid, String order) {
+        Scanner sc = new Scanner(System.in); // to scan where the positions are.
+        fillGrid(grid, order);  // the order to fill the grid that if we don't have this line the output will not recognize.
+            // when you want to add the row column position and returns with failure and errors
+        boolean[][] visible = new boolean[3][3];
+
+        // this for loop is when the fun begins and the B,V,H,P,U. are taking place in the code one by one
+        for (int i = 0; i < 9; i++) {
+            printGrid(grid, visible);  // the visible word makes the covered with X be changed
+            System.out.println("Please enter row-col location: "); // first row pos then push enter then  the column pos.
+            int row = sc.nextInt(); // to continue the rows and not have troubles after the first row predicted.
+            int col = sc.nextInt(); // to continue the columns and not have troubles after the first column predicted.
+            visible[row][col] = true; // to check if the row col position is in the grid (0,1,2 only).
+        }
+
+        printGrid(grid, visible); // to make all the grid visible after completing the 9 guesses
+
+            // after the end of the 9 guesses this line is when the guess begins, and you want to write your guess to the
+            // terminal by having 2 of each class eg:(CBPCHPUHB).
+            //also it will make the grid covered again to write the guess
+        System.out.println("Cover them again? (yes/no): ");
+        String response = sc.next();
+
+        // the following method is to not take case sensitivity as an error (YES,Yes,yes) will have the same effect.
+        if (response.equalsIgnoreCase("yes")) {
+            // the for loop to fill the array and change the false to true in every step
+            for (int i = 0; i < 3; i++) {
+                Arrays.fill(visible[i], false);
+            }
+            printGrid(grid, visible); // after all is true the grid will be printed as visible
+
+            // let the user enter the guess and make the compiler understand if the guess is correct
+            System.out.println("Enter your guess: ");
+            String guess = sc.next();
+            int correct = checkGuess(grid, guess);
+
+            // the if else statement to check weather the user guessed 4 or more guesses correctly they will win the
+            // game with the + correct + refers to the locations guessed correctly,  if less than 4 guesses are made the
+            // user will lose the game ( note that even if the user entered random words unrelated to the order it will
+            // consider as lose with 0 locations correctly eg:( writing bananas or banana142 ... etc ).
+            if (correct >= 4) {
+                System.out.println("You win! You guessed " + correct + " locations correctly.");
+            } else {
+                System.out.println("You lose. You guessed " + correct + " locations correctly.");
+            }
+        }
+
+        sc.close(); // the end of the scan and the game is over
+    }
+
+    // the main function is important to let the code run
+    public static void main(String[] args) {
+        Identifiable[][] grid = new Identifiable[3][3];  // Calls a 3x3 array of Identifiable objects to represent the game grid
+        String order = "CBHUCBHPP"; // the order we wanted , the user can change it for whatever they want
+        playGame(grid, order);
+    }
+        }
